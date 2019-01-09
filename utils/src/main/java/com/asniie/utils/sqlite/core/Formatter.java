@@ -12,6 +12,10 @@ public final class Formatter {
     public static String format(Method method, String str, Object[] objs) {
         String sql = str;
 
+        if (objs == null || objs.length == 0) {
+            return sql;
+        }
+
         Annotation[][] annotationsArray = method.getParameterAnnotations();
 
         if (annotationsArray == null || annotationsArray.length == 0) {
@@ -50,7 +54,7 @@ public final class Formatter {
                 if (value != null) {
                     str = str.replace(matcher.group(), String.valueOf(value));
                 }
-                LogUtil.debug("sql-->" + str);
+                //LogUtil.debug("sql-->" + str);
             }
         }
         return str;
@@ -60,9 +64,9 @@ public final class Formatter {
         try {
             Class<?> clazz = object.getClass();
 
-            Method method = clazz.getMethod(getterMethodName(name), null);
+            Method method = clazz.getMethod(getterMethodName(name), new Class<?>[]{});
 
-            return method.invoke(object, null);
+            return method.invoke(object, new Object[]{});
         } catch (Exception e) {
             LogUtil.debug(e);
         }

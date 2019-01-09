@@ -3,7 +3,12 @@ package com.asniie.utils.sqlite.core;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
+import com.asniie.utils.LogUtil;
 import com.asniie.utils.sqlite.annotations.database;
 import com.asniie.utils.sqlite.annotations.query;
 import com.asniie.utils.sqlite.annotations.update;
@@ -35,20 +40,44 @@ public final class InstanceProxy implements InvocationHandler {
     }
 
     private Object exec(Method method, Object[] args) {
-        Object object = null;
+        Object obj = null;
 
         mDataBase.connect(parseClassAnnotation(method));
 
         update update = method.getAnnotation(update.class);
 
         if (update != null) {
-            String sql = Formatter.format(method, update.value(), args);
-            object = mDataBase.update(sql);
+
+            List<Object> objects = parseList(args);
+
+            if (objects != null) {
+                mDataBase.beginTransaction();
+
+                int code = 0;
+                for (Object object : objects) {
+                    String sql = Formatter.format(method, update.value(), new Object[]{object});
+                    LogUtil.debug("sql = " + sql);
+                    code = mDataBase.update(sql);
+                    if (code == 0) {
+                        break;
+                    }
+                }
+
+                if (code != 0) {
+                    mDataBase.commit();
+                }
+                mDataBase.endTransaction();
+
+                obj = code;
+            } else {
+                String sql = Formatter.format(method, update.value(), args);
+                obj = mDataBase.update(sql);
+            }
         } else {
             query query = method.getAnnotation(query.class);
             if (query != null) {
                 String sql = Formatter.format(method, query.value(), args);
-                object = mDataBase.query(sql);
+                obj = mDataBase.query(sql);
             }
         }
 
@@ -56,7 +85,7 @@ public final class InstanceProxy implements InvocationHandler {
             mDataBase.close();
         }
 
-        return object;
+        return obj;
     }
 
     private String parseClassAnnotation(Method method) {
@@ -66,6 +95,24 @@ public final class InstanceProxy implements InvocationHandler {
 
         return db.value();
     }
+
+    private List<Object> parseList(Object[] objects) {
+
+        if (objects != null && objects.length == 1) {
+            Object object = objects[0];
+            if (object instanceof List) {
+                return (List<Object>) object;
+            } else if (object.getClass().isArray()) {
+                return Arrays.asList((Object[]) object);
+            }
+        }
+        return null;
+    }
+
+
+
+
+
     /*
 
     private int update(DataBase db, String sql) {

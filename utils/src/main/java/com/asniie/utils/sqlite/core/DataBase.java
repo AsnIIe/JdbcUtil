@@ -14,6 +14,12 @@ public interface DataBase {
 
     void close();
 
+    void beginTransaction();
+
+    void commit();
+
+    void endTransaction();
+
     int update(String sql);
 
     Object query(String sql);

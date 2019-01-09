@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
+import com.asniie.utils.LogUtil;
 import com.asniie.utils.sqlite.core.DataBase;
 import com.asniie.utils.sqlite.core.InstanceProxy;
 import com.asniie.utils.sqlite.exception.DataBaseException;
@@ -38,6 +39,24 @@ public final class AndroidDb implements DataBase {
     }
 
     @Override
+    public void beginTransaction() {
+        if (database!=null)
+            database.beginTransaction();
+    }
+
+    @Override
+    public void commit() {
+        if (database!=null)
+            database.setTransactionSuccessful();
+    }
+
+    @Override
+    public void endTransaction() {
+        if (database!=null)
+            database.endTransaction();
+    }
+
+    @Override
     public int update(String sql) {
         try {
             database.execSQL(sql);
@@ -50,12 +69,39 @@ public final class AndroidDb implements DataBase {
     @Override
     public Object query(String sql) {
         Cursor cursor = database.rawQuery(sql, null);
+
+        LogUtil.debug(sql);
         Map<String, Object> map = new HashMap<>();
 
-        map.put("id", 3);
-        map.put("name", "小明");
-        map.put("age", 20);
-        cursor.close();
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            int columnCount = cursor.getColumnCount();
+            for (int i = 0; i < columnCount; i++) {
+                int type = cursor.getType(i);
+                String key = cursor.getColumnName(i);
+
+                switch (type) {
+                    case Cursor.FIELD_TYPE_STRING:
+                        map.put(key, cursor.getString(i));
+                        break;
+                    case Cursor.FIELD_TYPE_INTEGER:
+                        map.put(key, cursor.getInt(i));
+                        break;
+                    case Cursor.FIELD_TYPE_FLOAT:
+                        map.put(key, cursor.getFloat(i));
+                        break;
+                    case Cursor.FIELD_TYPE_NULL:
+                        map.put(key, null);
+                        break;
+                    case Cursor.FIELD_TYPE_BLOB:
+
+                        break;
+                }
+            }
+            cursor.moveToNext();
+        }
+
         return map;
     }
 
