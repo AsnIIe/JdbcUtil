@@ -1,7 +1,5 @@
 package com.asniie.utils.sqlite.core;
 
-import android.util.Log;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.regex.Matcher;
@@ -10,18 +8,18 @@ import java.util.regex.Pattern;
 import com.asniie.utils.LogUtil;
 import com.asniie.utils.sqlite.annotations.param;
 
-public final class Formater {
+public final class Formatter {
     public static String format(Method method, String str, Object[] objs) {
         String sql = str;
 
-        Annotation[][] annotationsArry = method.getParameterAnnotations();
+        Annotation[][] annotationsArray = method.getParameterAnnotations();
 
-        if (annotationsArry == null || annotationsArry.length == 0) {
+        if (annotationsArray == null || annotationsArray.length == 0) {
             return sql;
         }
 
-        for (int i = 0; i < annotationsArry.length; i++) {
-            Annotation[] annotations = annotationsArry[i];
+        for (int i = 0; i < annotationsArray.length; i++) {
+            Annotation[] annotations = annotationsArray[i];
 
             for (Annotation annotation : annotations) {
                 if (annotation instanceof param) {
@@ -52,7 +50,7 @@ public final class Formater {
                 if (value != null) {
                     str = str.replace(matcher.group(), String.valueOf(value));
                 }
-                LogUtil.print("sql-->" + str);
+                LogUtil.debug("sql-->" + str);
             }
         }
         return str;
@@ -66,7 +64,7 @@ public final class Formater {
 
             return method.invoke(object, null);
         } catch (Exception e) {
-            LogUtil.print(e);
+            LogUtil.debug(e);
         }
 
         return null;
