@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         api.insert2(persons);
 
-        view.setText("" + api.queryByAge(22));
+        view.setText("" + api.queryByAge(23));
 
         /*Map<String, String> map = api.queryById(100);
 

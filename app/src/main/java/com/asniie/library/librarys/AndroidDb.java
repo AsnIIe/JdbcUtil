@@ -4,14 +4,17 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
-import com.asniie.utils.LogUtil;
 import com.asniie.utils.sqlite.core.DataBase;
 import com.asniie.utils.sqlite.core.InstanceProxy;
 import com.asniie.utils.sqlite.exception.DataBaseException;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -19,6 +22,7 @@ import java.util.Map;
  */
 public final class AndroidDb implements DataBase {
     private SQLiteDatabase database = null;
+    private final Gson mGson = new Gson();
     private static InstanceProxy mProxy = new InstanceProxy(new AndroidDb());
 
     public static <T> T create(Class<T> clazz) {
@@ -27,9 +31,7 @@ public final class AndroidDb implements DataBase {
 
     @Override
     public boolean isOpen() {
-        if (database != null)
-            return database.isOpen();
-        return false;
+        return database != null && database.isOpen();
     }
 
     @Override
@@ -40,24 +42,25 @@ public final class AndroidDb implements DataBase {
 
     @Override
     public void beginTransaction() {
-        if (database!=null)
+        if (database != null)
             database.beginTransaction();
     }
 
     @Override
     public void commit() {
-        if (database!=null)
+        if (database != null)
             database.setTransactionSuccessful();
     }
 
     @Override
     public void endTransaction() {
-        if (database!=null)
+        if (database != null)
             database.endTransaction();
     }
 
     @Override
     public int update(String sql) {
+
         try {
             database.execSQL(sql);
         } catch (Exception e) {
@@ -67,15 +70,16 @@ public final class AndroidDb implements DataBase {
     }
 
     @Override
-    public Object query(String sql) {
+    public Object query(String sql, Type returnType) {
         Cursor cursor = database.rawQuery(sql, null);
 
-        LogUtil.debug(sql);
-        Map<String, Object> map = new HashMap<>();
+        List<Map<String, Object>> array = new ArrayList();
 
         cursor.moveToFirst();
 
         while (!cursor.isAfterLast()) {
+            Map<String, Object> map = new HashMap<>();
+
             int columnCount = cursor.getColumnCount();
             for (int i = 0; i < columnCount; i++) {
                 int type = cursor.getType(i);
@@ -99,10 +103,11 @@ public final class AndroidDb implements DataBase {
                         break;
                 }
             }
+
+            array.add(map);
             cursor.moveToNext();
         }
-
-        return map;
+        return mGson.fromJson(mGson.toJson(array), returnType);
     }
 
     @Override

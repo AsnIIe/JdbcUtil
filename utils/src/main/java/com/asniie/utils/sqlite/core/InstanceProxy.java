@@ -1,18 +1,16 @@
 package com.asniie.utils.sqlite.core;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import com.asniie.utils.LogUtil;
 import com.asniie.utils.sqlite.annotations.database;
 import com.asniie.utils.sqlite.annotations.query;
 import com.asniie.utils.sqlite.annotations.update;
 import com.asniie.utils.sqlite.exception.DataBaseException;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 
 public final class InstanceProxy implements InvocationHandler {
     private DataBase mDataBase = null;
@@ -44,6 +42,8 @@ public final class InstanceProxy implements InvocationHandler {
 
         mDataBase.connect(parseClassAnnotation(method));
 
+        Type returnType = method.getGenericReturnType();
+
         update update = method.getAnnotation(update.class);
 
         if (update != null) {
@@ -56,7 +56,7 @@ public final class InstanceProxy implements InvocationHandler {
                 int code = 0;
                 for (Object object : objects) {
                     String sql = Formatter.format(method, update.value(), new Object[]{object});
-                    LogUtil.debug("sql = " + sql);
+                    //LogUtil.debug("sql = " + sql);
                     code = mDataBase.update(sql);
                     if (code == 0) {
                         break;
@@ -68,7 +68,11 @@ public final class InstanceProxy implements InvocationHandler {
                 }
                 mDataBase.endTransaction();
 
-                obj = code;
+                if (returnType.equals(boolean.class) || returnType.equals(Boolean.class)) {
+                    obj = (code != 0);
+                } else {
+                    obj = code;
+                }
             } else {
                 String sql = Formatter.format(method, update.value(), args);
                 obj = mDataBase.update(sql);
@@ -77,7 +81,8 @@ public final class InstanceProxy implements InvocationHandler {
             query query = method.getAnnotation(query.class);
             if (query != null) {
                 String sql = Formatter.format(method, query.value(), args);
-                obj = mDataBase.query(sql);
+
+                obj = mDataBase.query(sql, returnType);
             }
         }
 
@@ -108,26 +113,4 @@ public final class InstanceProxy implements InvocationHandler {
         }
         return null;
     }
-
-
-
-
-
-    /*
-
-    private int update(DataBase db, String sql) {
-        LogUtil.debug("exec: query-->" + sql);
-        return db.update(sql);
-    }
-
-    private Object query(DataBase db, String sql) {
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("id", 3);
-        map.put("name", "小明");
-        map.put("age", 20);
-
-        LogUtil.debug("exec: sql-->" + sql);
-        return map;
-    }*/
 }
