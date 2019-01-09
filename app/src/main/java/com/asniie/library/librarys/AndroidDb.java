@@ -107,6 +107,8 @@ public final class AndroidDb implements DataBase {
             array.add(map);
             cursor.moveToNext();
         }
+
+        cursor.close();
         return mGson.fromJson(mGson.toJson(array), returnType);
     }
 
