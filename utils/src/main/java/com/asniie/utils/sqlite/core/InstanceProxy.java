@@ -66,6 +66,8 @@ public final class InstanceProxy implements InvocationHandler {
                         } else {
                             return execTransaction((update) annotation, paramAnnotations, params, returnType);
                         }
+                    } else {
+                        return execUpdate((update) annotation, null, null, returnType);
                     }
                 } else if (annotation instanceof query) {
                     return execQuery((query) annotation, paramAnnotations, objects, returnType);

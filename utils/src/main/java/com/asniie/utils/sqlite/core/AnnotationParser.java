@@ -5,6 +5,7 @@ import com.asniie.utils.sqlite.annotations.database;
 import com.asniie.utils.sqlite.annotations.param;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,7 +63,6 @@ public final class AnnotationParser {
                 if (value != null) {
                     temp = temp.replace(matcher.group(), String.valueOf(value));
                 }
-                //LogUtil.debug("sql-->" + str);
             }
         }
         return temp;
@@ -72,7 +72,13 @@ public final class AnnotationParser {
         try {
             Class<?> clazz = object.getClass();
 
-            Method method = clazz.getMethod(parseMethodName(name), new Class<?>[]{});
+            Field field = clazz.getDeclaredField(name);
+
+            Class<?> type = field.getType();
+
+            boolean isBool = type.equals(boolean.class) || type.equals(Boolean.class);
+
+            Method method = clazz.getMethod(parseMethodName(name, isBool), new Class<?>[]{});
 
             return method.invoke(object, new Object[]{});
         } catch (Exception e) {
@@ -82,11 +88,11 @@ public final class AnnotationParser {
         return null;
     }
 
-    private static String parseMethodName(String methodName) {
+    private static String parseMethodName(String methodName, boolean isBool) {
         methodName = methodName.replaceAll("\\s", "");
 
         char ch = methodName.charAt(0);
-        String set = "get".concat(String.valueOf(Character.toUpperCase(ch)));
+        String set = (isBool ? "is" : "get").concat(String.valueOf(Character.toUpperCase(ch)));
         return methodName.replaceFirst(String.valueOf(ch), set);
     }
 
