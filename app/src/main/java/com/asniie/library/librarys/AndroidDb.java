@@ -122,7 +122,7 @@ public final class AndroidDb implements DataBase {
             } catch (IOException e) {
                 throw new DataBaseException(e);
             }
-        }
+    }
         database = SQLiteDatabase.openOrCreateDatabase(file.getAbsolutePath(), null);
     }
 }
