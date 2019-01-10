@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.asniie.utils.LogUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         Student student = new Student();
         student.setId(100);
 
-        api.insert(person, student);
+        LogUtil.debug(api.insert(person, student));
     }
 
     private void requestPermission() {

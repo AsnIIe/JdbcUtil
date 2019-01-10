@@ -5,11 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
 import com.asniie.utils.LogUtil;
-import com.asniie.utils.sqlite.interceptors.AbstractInterceptor;
-import com.asniie.utils.sqlite.interceptors.InterceptorChain;
 import com.asniie.utils.sqlite.core.InstanceProxy;
 import com.asniie.utils.sqlite.exception.DataBaseException;
-import com.google.gson.Gson;
+import com.asniie.utils.sqlite.interceptors.AbstractInterceptor;
+import com.asniie.utils.sqlite.interceptors.InterceptorChain;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +23,6 @@ import java.util.Map;
  * Created by XiaoWei on 2019/1/10.
  */
 public final class AndroidSQLite extends AbstractInterceptor {
-    private final Gson mGson = new Gson();
 
     static {
         InterceptorChain.addInterceptor(new AndroidSQLite());
@@ -69,11 +67,7 @@ public final class AndroidSQLite extends AbstractInterceptor {
             }
             database.endTransaction();
 
-            if (returnType.equals(boolean.class) || returnType.equals(Boolean.class)) {
-                object = (count != 0);
-            } else {
-                object = count;
-            }
+            object = count;
         }
 
         if (database != null && database.isOpen()) {
@@ -81,10 +75,9 @@ public final class AndroidSQLite extends AbstractInterceptor {
             database = null;
         }
 
-        return object;
+        return TypeConverter.convert(object, returnType);
     }
 
-    //private int executeSql(String sql, Object[] bindArgs) throws SQLException {
     private int executeSql(SQLiteDatabase db, String sql) throws Exception {
         int count = 0;
         Method method = SQLiteDatabase.class.getDeclaredMethod("executeSql", String.class, Object[].class);
@@ -148,7 +141,7 @@ public final class AndroidSQLite extends AbstractInterceptor {
 
         cursor.close();
 
-        return mGson.fromJson(mGson.toJson(array), returnType);
+        return array;
     }
 
     private SQLiteDatabase connect(String path) throws DataBaseException {

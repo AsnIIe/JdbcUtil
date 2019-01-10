@@ -18,7 +18,7 @@ public interface SQLiteAPI {
     List<Person> query(@param("name") String name, @param("age") int age);
 
     @update("insert into student (id,name,age) values(${student.id},'${person.name}',${person.age})")
-    boolean insert(@param("person") Person person, @param("student") Student student);
+    int insert(@param("person") Person person, @param("student") Student student);
 
     @update("insert into student (id,name,age) values (${person.id},'${person.name}',${person.age})")
     int insert2(@param("person") List<Person> persons);
