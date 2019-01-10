@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
 import com.asniie.utils.LogUtil;
-import com.asniie.utils.sqlite.Interceptor.AbstractInterceptor;
-import com.asniie.utils.sqlite.Interceptor.InterceptorChain;
+import com.asniie.utils.sqlite.interceptors.AbstractInterceptor;
+import com.asniie.utils.sqlite.interceptors.InterceptorChain;
 import com.asniie.utils.sqlite.core.InstanceProxy;
 import com.asniie.utils.sqlite.exception.DataBaseException;
 import com.google.gson.Gson;

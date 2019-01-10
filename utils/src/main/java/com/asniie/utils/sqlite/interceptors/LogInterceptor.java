@@ -1,4 +1,4 @@
-package com.asniie.utils.sqlite.Interceptor;
+package com.asniie.utils.sqlite.interceptors;
 
 import com.asniie.utils.LogUtil;
 

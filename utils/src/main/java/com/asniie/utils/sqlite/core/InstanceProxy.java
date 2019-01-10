@@ -1,7 +1,7 @@
 package com.asniie.utils.sqlite.core;
 
-import com.asniie.utils.sqlite.Interceptor.Interceptor;
-import com.asniie.utils.sqlite.Interceptor.InterceptorChain;
+import com.asniie.utils.sqlite.interceptors.Interceptor;
+import com.asniie.utils.sqlite.interceptors.InterceptorChain;
 import com.asniie.utils.sqlite.annotations.query;
 import com.asniie.utils.sqlite.annotations.update;
 import com.asniie.utils.sqlite.exception.DataBaseException;
