@@ -11,9 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asniie.utils.sqlite.Interceptor.InterceptorChain;
-import com.asniie.utils.sqlite.core.InstanceProxy;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -29,8 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView view = findViewById(R.id.tv);
 
-        InterceptorChain.addInterceptor(new AndroidInterceptor());
-        SQLiteAPI api = InstanceProxy.create(SQLiteAPI.class);
+        SQLiteAPI api = AndroidSQLite.create(SQLiteAPI.class);
 
         api.createTable();
 
@@ -38,7 +34,9 @@ public class MainActivity extends AppCompatActivity {
         List<Person> persons = new ArrayList<>(15);
         Random random = new Random();
 
-        for (int i = 0; i < 15; i++) {
+        int n = random.nextInt(20) + 1;
+
+        for (int i = 0; i < n; i++) {
             Person person = new Person();
             person.setAge(random.nextInt(12) + 15);
             person.setId(random.nextInt(1000));
@@ -47,13 +45,11 @@ public class MainActivity extends AppCompatActivity {
             persons.add(person);
         }
 
-        api.insert2(persons);
+        int count = api.insert2(persons);
 
-        view.setText("" + api.query("小辉", 23));
+        view.setText(String.format("插入数据：%d条,\n查询数据如下：\n%s", count, api.query("小辉", 23)));
 
-        /*Map<String, String> map = api.queryById(100);
-
-        view.setText(map.toString());
+        api.queryById(100);
 
         Person person = new Person();
         person.setAge(18);
@@ -63,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         Student student = new Student();
         student.setId(100);
 
-        api.insert(person, student);*/
+        api.insert(person, student);
     }
 
     private void requestPermission() {

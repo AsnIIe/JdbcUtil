@@ -4,12 +4,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
+import com.asniie.utils.LogUtil;
 import com.asniie.utils.sqlite.Interceptor.AbstractInterceptor;
+import com.asniie.utils.sqlite.Interceptor.InterceptorChain;
+import com.asniie.utils.sqlite.core.InstanceProxy;
 import com.asniie.utils.sqlite.exception.DataBaseException;
 import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,8 +23,19 @@ import java.util.Map;
 /*
  * Created by XiaoWei on 2019/1/10.
  */
-public final class AndroidInterceptor extends AbstractInterceptor {
+public final class AndroidSQLite extends AbstractInterceptor {
     private final Gson mGson = new Gson();
+
+    static {
+        InterceptorChain.addInterceptor(new AndroidSQLite());
+    }
+
+    private AndroidSQLite() {
+    }
+
+    public static <T> T create(Class<T> clazz) {
+        return InstanceProxy.create(clazz);
+    }
 
     @Override
     public Object intercept(String[] sqls, ExecType type, Type returnType) {
@@ -63,16 +78,31 @@ public final class AndroidInterceptor extends AbstractInterceptor {
 
         if (database != null && database.isOpen()) {
             database.close();
+            database = null;
         }
 
         return object;
     }
 
+    //private int executeSql(String sql, Object[] bindArgs) throws SQLException {
+    private int executeSql(SQLiteDatabase db, String sql) throws Exception {
+        int count = 0;
+        Method method = SQLiteDatabase.class.getDeclaredMethod("executeSql", String.class, Object[].class);
+
+        if (method != null) {
+            method.setAccessible(true);
+            count = (int) method.invoke(db, sql, null);
+        }
+
+        return count;
+    }
+
     private int update(SQLiteDatabase database, String sql) {
         try {
-            database.execSQL(sql);
-            return 1;
+            return executeSql(database, sql);
         } catch (Exception e) {
+            LogUtil.debug(e);
+            //database.execSQL(sql);
             return 0;
         }
     }
@@ -117,6 +147,7 @@ public final class AndroidInterceptor extends AbstractInterceptor {
         }
 
         cursor.close();
+
         return mGson.fromJson(mGson.toJson(array), returnType);
     }
 

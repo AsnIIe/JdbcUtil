@@ -15,7 +15,6 @@ public class LogUtil {
     public static void debug(Object obj) {
         if (obj instanceof Throwable) {
             Throwable throwable = (Throwable) obj;
-            Log.i(TAG, "-----------------------START------------------------");
             throwable.printStackTrace();
         } else {
             Log.i(TAG, format(obj));
