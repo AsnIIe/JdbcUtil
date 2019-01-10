@@ -3,13 +3,16 @@ package com.asniie.library.librarys;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.asniie.utils.sqlite.Interceptor.InterceptorChain;
+import com.asniie.utils.sqlite.core.InstanceProxy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +28,9 @@ public class MainActivity extends AppCompatActivity {
         this.requestPermission();
 
         TextView view = findViewById(R.id.tv);
-        SQLiteAPI api = AndroidDb.create(SQLiteAPI.class);
+
+        InterceptorChain.addInterceptor(new AndroidInterceptor());
+        SQLiteAPI api = InstanceProxy.create(SQLiteAPI.class);
 
         api.createTable();
 
@@ -36,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 15; i++) {
             Person person = new Person();
             person.setAge(random.nextInt(12) + 15);
-            person.setId(1);
+            person.setId(random.nextInt(1000));
             person.setName(names[random.nextInt(4)]);
 
             persons.add(person);
@@ -44,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         api.insert2(persons);
 
-        view.setText("" + api.queryByAge(23));
+        view.setText("" + api.query("小辉", 23));
 
         /*Map<String, String> map = api.queryById(100);
 

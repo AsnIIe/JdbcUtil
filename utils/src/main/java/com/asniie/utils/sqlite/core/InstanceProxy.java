@@ -1,5 +1,7 @@
 package com.asniie.utils.sqlite.core;
 
+import com.asniie.utils.sqlite.Interceptor.Interceptor;
+import com.asniie.utils.sqlite.Interceptor.InterceptorChain;
 import com.asniie.utils.sqlite.annotations.query;
 import com.asniie.utils.sqlite.annotations.update;
 import com.asniie.utils.sqlite.exception.DataBaseException;
@@ -13,15 +15,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class InstanceProxy implements InvocationHandler {
-    private DataBase mDataBase = null;
 
-    public InstanceProxy(DataBase db) {
-        mDataBase = db;
+    private InstanceProxy() {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T create(Class<T> clazz) {
-        T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, this);
+    public static <T> T create(Class<T> clazz) {
+        T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new InstanceProxy());
         return proxy;
     }
 
@@ -38,9 +38,6 @@ public final class InstanceProxy implements InvocationHandler {
     }
 
     private Object exec(Method method, Object[] objects) {
-
-        //连接数据库
-        mDataBase.connect(AnnotationParser.parseUri(method.getDeclaringClass()));
 
         Annotation[] annotations = method.getAnnotations();
 
@@ -80,60 +77,24 @@ public final class InstanceProxy implements InvocationHandler {
 
     private Object execUpdate(update update, Annotation[][] paramAnnotations, Object[] params, Type returnType) {
         String sql = AnnotationParser.parseSQL(update.value(), paramAnnotations, params);
-        int result = mDataBase.update(sql);
 
-        this.closeDb();
-
-        if (needConvert(returnType)) {
-            return result != 0;
-        } else {
-            return result;
-        }
+        return InterceptorChain.intercept(new String[]{sql}, Interceptor.ExecType.UPDATE, returnType);
     }
 
     private Object execTransaction(update update, Annotation[][] paramAnnotations, List<Object> objects, Type returnType) {
+        int size = objects.size();
+        String[] sqls = new String[size];
 
-        mDataBase.beginTransaction();
-
-        int result = 0;
-        for (Object object : objects) {
-            String sql = AnnotationParser.parseSQL(update.value(), paramAnnotations, new Object[]{object});
-            result = mDataBase.update(sql);
-            if (result == 0) {
-                break;
-            }
+        for (int i = 0; i < size; i++) {
+            sqls[i] = AnnotationParser.parseSQL(update.value(), paramAnnotations, new Object[]{objects.get(i)});
         }
 
-        if (result != 0) {
-            mDataBase.commit();
-        }
-        mDataBase.endTransaction();
-
-        this.closeDb();
-
-        if (needConvert(returnType)) {
-            return result != 0;
-        } else {
-            return result;
-        }
+        return InterceptorChain.intercept(sqls, Interceptor.ExecType.UPDATE, returnType);
     }
 
     private Object execQuery(query query, Annotation[][] paramAnnotations, Object[] params, Type returnType) {
         String sql = AnnotationParser.parseSQL(query.value(), paramAnnotations, params);
 
-        Object object = mDataBase.query(sql, returnType);
-
-        this.closeDb();
-        return object;
-    }
-
-    private boolean needConvert(Type returnType) {
-        return returnType.equals(boolean.class) || returnType.equals(Boolean.class);
-    }
-
-    private void closeDb() {
-        if (mDataBase != null && mDataBase.isOpen()) {
-            mDataBase.close();
-        }
+        return InterceptorChain.intercept(new String[]{sql}, Interceptor.ExecType.QUERY, returnType);
     }
 }

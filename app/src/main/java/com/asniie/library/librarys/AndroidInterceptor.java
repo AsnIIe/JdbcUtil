@@ -4,8 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
-import com.asniie.utils.sqlite.core.DataBase;
-import com.asniie.utils.sqlite.core.InstanceProxy;
+import com.asniie.utils.sqlite.Interceptor.AbstractInterceptor;
 import com.asniie.utils.sqlite.exception.DataBaseException;
 import com.google.gson.Gson;
 
@@ -18,62 +17,71 @@ import java.util.List;
 import java.util.Map;
 
 /*
- * Created by XiaoWei on 2019/1/9.
+ * Created by XiaoWei on 2019/1/10.
  */
-public final class AndroidDb implements DataBase {
-    private SQLiteDatabase database = null;
+public final class AndroidInterceptor extends AbstractInterceptor {
     private final Gson mGson = new Gson();
-    private static InstanceProxy mProxy = new InstanceProxy(new AndroidDb());
-
-    public static <T> T create(Class<T> clazz) {
-        return mProxy.create(clazz);
-    }
 
     @Override
-    public boolean isOpen() {
-        return database != null && database.isOpen();
-    }
+    public Object intercept(String[] sqls, ExecType type, Type returnType) {
+        SQLiteDatabase database = connect("database.db");
 
-    @Override
-    public void close() {
-        if (database != null)
-            database.close();
-    }
+        Object object = null;
 
-    @Override
-    public void beginTransaction() {
-        if (database != null)
+        if (type == ExecType.QUERY) {
+            for (String sql : sqls) {
+                if (sql != null) {
+                    object = query(database, sql, returnType);
+                }
+            }
+        } else {
+            int count = 0;
+
             database.beginTransaction();
-    }
-
-    @Override
-    public void commit() {
-        if (database != null)
-            database.setTransactionSuccessful();
-    }
-
-    @Override
-    public void endTransaction() {
-        if (database != null)
+            for (String sql : sqls) {
+                if (sql != null) {
+                    int code = update(database, sql);
+                    if (code == 0) {
+                        count = 0;
+                        break;
+                    } else {
+                        count += code;
+                    }
+                }
+            }
+            if (count != 0) {
+                database.setTransactionSuccessful();
+            }
             database.endTransaction();
+
+            if (returnType.equals(boolean.class) || returnType.equals(Boolean.class)) {
+                object = (count != 0);
+            } else {
+                object = count;
+            }
+        }
+
+        if (database != null && database.isOpen()) {
+            database.close();
+        }
+
+        return object;
     }
 
-    @Override
-    public int update(String sql) {
-
+    private int update(SQLiteDatabase database, String sql) {
         try {
             database.execSQL(sql);
+            return 1;
         } catch (Exception e) {
             return 0;
         }
-        return 1;
     }
 
-    @Override
-    public Object query(String sql, Type returnType) {
+    private Object query(SQLiteDatabase database, String sql, Type returnType) {
+
         Cursor cursor = database.rawQuery(sql, null);
 
-        List<Map<String, Object>> array = new ArrayList();
+        List<Map<String, Object>> array = new ArrayList<>();
 
         cursor.moveToFirst();
 
@@ -112,8 +120,7 @@ public final class AndroidDb implements DataBase {
         return mGson.fromJson(mGson.toJson(array), returnType);
     }
 
-    @Override
-    public void connect(String path) throws DataBaseException {
+    private SQLiteDatabase connect(String path) throws DataBaseException {
         File file = new File(Environment.getExternalStorageDirectory(), path);
         if (!file.exists()) {
             file.getParentFile().mkdirs();
@@ -122,7 +129,7 @@ public final class AndroidDb implements DataBase {
             } catch (IOException e) {
                 throw new DataBaseException(e);
             }
-    }
-        database = SQLiteDatabase.openOrCreateDatabase(file.getAbsolutePath(), null);
+        }
+        return SQLiteDatabase.openOrCreateDatabase(file.getAbsolutePath(), null);
     }
 }

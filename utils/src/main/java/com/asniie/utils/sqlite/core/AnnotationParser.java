@@ -1,7 +1,6 @@
 package com.asniie.utils.sqlite.core;
 
 import com.asniie.utils.LogUtil;
-import com.asniie.utils.sqlite.annotations.database;
 import com.asniie.utils.sqlite.annotations.param;
 
 import java.lang.annotation.Annotation;
@@ -18,12 +17,9 @@ public final class AnnotationParser {
 
     private static final Pattern PATTERN_FIELD = Pattern.compile(REGEX_FIELD);
 
-    public static String parseUri(Class<?> owner) {
-        database db = owner.getAnnotation(database.class);
-        return db.value();
-    }
-
     public static String parseSQL(String temp, Annotation[][] paramAnnotations, Object[] params) {
+
+        String sql = temp;
 
         if (check(temp, paramAnnotations, params)) {
             for (int i = 0; i < paramAnnotations.length; i++) {
@@ -34,18 +30,13 @@ public final class AnnotationParser {
                         param param = (param) annotation;
                         String key = param.value();
 
-                        Matcher matcher = PATTERN_FIELD.matcher(temp);
-
-                        if (matcher.find()) {
-                            return parseField(key, temp, params[i]);
-                        } else {
-                            return parseKey(temp, key, String.valueOf(params[i]));
-                        }
+                        sql = parseField(key, sql, params[i]);
+                        sql = parseKey(sql, key, String.valueOf(params[i]));
                     }
                 }
             }
         }
-        return temp;
+        return sql;
     }
 
     private static String parseKey(String temp, String key, String value) {
@@ -58,17 +49,17 @@ public final class AnnotationParser {
         while (matcher.find()) {
             if (className.equals(matcher.group(1).trim())) {
 
-                Object value = accessValue(object, matcher.group(2));
+                String value = accessValue(object, matcher.group(2));
 
                 if (value != null) {
-                    temp = temp.replace(matcher.group(), String.valueOf(value));
+                    temp = temp.replace(matcher.group(), value);
                 }
             }
         }
         return temp;
     }
 
-    private static Object accessValue(Object object, String name) {
+    private static String accessValue(Object object, String name) {
         try {
             Class<?> clazz = object.getClass();
 
@@ -80,13 +71,27 @@ public final class AnnotationParser {
 
             Method method = clazz.getMethod(parseMethodName(name, isBool), new Class<?>[]{});
 
-            return method.invoke(object, new Object[]{});
+            return escape(String.valueOf(method.invoke(object, new Object[]{})));
         } catch (Exception e) {
             LogUtil.debug(e);
         }
 
         return null;
     }
+
+    private static String escape(String str) {
+        str = str.replace("/", "//");
+        str = str.replace("'", "''");
+        str = str.replace("[", "/[");
+        str = str.replace("]", "/]");
+        str = str.replace("%", "/%");
+        str = str.replace("&", "/&");
+        str = str.replace("_", "/_");
+        str = str.replace("(", "/(");
+        str = str.replace(")", "/)");
+        return str;
+    }
+
 
     private static String parseMethodName(String methodName, boolean isBool) {
         methodName = methodName.replaceAll("\\s", "");

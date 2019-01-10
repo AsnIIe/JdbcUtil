@@ -13,7 +13,13 @@ public class LogUtil {
     }
 
     public static void debug(Object obj) {
-        Log.i(TAG, format(obj));
+        if (obj instanceof Throwable) {
+            Throwable throwable = (Throwable) obj;
+            Log.i(TAG, "-----------------------START------------------------");
+            throwable.printStackTrace();
+        } else {
+            Log.i(TAG, format(obj));
+        }
     }
 
     public static void print(Object obj) {
