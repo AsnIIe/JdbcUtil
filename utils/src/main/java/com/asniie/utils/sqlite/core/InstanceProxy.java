@@ -37,6 +37,7 @@ public final class InstanceProxy implements InvocationHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Object exec(Method method, Object[] objects) {
 
         Annotation[] annotations = method.getAnnotations();

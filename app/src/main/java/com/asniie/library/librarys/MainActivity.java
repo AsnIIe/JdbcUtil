@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             persons.add(person);
         }
 
-        int count = api.insert2(persons);
+        int count = api.insertStudents(persons);
 
         view.setText(String.format("插入数据：%d条,\n查询数据如下：\n%s", count, api.query("小辉", 23)));
 

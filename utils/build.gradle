@@ -32,3 +32,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+/*
+
+def releaseJar = file('build/intermediates/intermediate-jars/release/classes.jar')
+task makeJar(type: Jar) {
+    baseName 'utils'
+    from zipTree(releaseJar)
+    exclude('com/asniie/library/', '')
+}*/

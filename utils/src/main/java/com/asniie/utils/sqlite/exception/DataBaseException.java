@@ -20,7 +20,4 @@ public final class DataBaseException extends RuntimeException {
         super(cause);
     }
 
-    protected DataBaseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }
