@@ -50,7 +50,8 @@ public final class AnnotationParser {
     private static String parseField(String className, String temp, Object object) {
         Matcher matcher = PATTERN_FIELD.matcher(temp);
         while (matcher.find()) {
-            String[] attrs = matcher.group(1).trim().split("\\.");
+            String group = matcher.group(1).replaceAll("\\s", "");
+            String[] attrs = group.split("\\.");
             if (className.equals(attrs[0])) {
                 Object value = object;
                 for (int i = 1; i < attrs.length; i++) {
