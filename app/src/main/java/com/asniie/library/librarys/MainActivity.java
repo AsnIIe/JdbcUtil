@@ -14,7 +14,9 @@ import android.widget.Toast;
 import com.asniie.utils.LogUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -49,19 +51,49 @@ public class MainActivity extends AppCompatActivity {
 
         int count = api.insertStudents(persons);
 
-        view.setText(String.format("插入数据：%d条,\n查询数据如下：\n%s", count, api.query("小辉", 23)));
+        Teacher teacher = initTeacher();
 
-        api.queryById(100);
+        view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count, api.queryStudentByTeacher(teacher)));
+
+        LogUtil.debug(api.queryById(100));
 
         Person person = new Person();
         person.setAge(18);
         person.setId(1);
-        person.setName("小玲");
+        person.setName("小明");
 
         Student student = new Student();
         student.setId(100);
 
         LogUtil.debug(api.insert(person, student));
+    }
+
+    private Teacher initTeacher() {
+        Teacher teacher = new Teacher();
+        List<Student> students = new ArrayList<>();
+        Map<String, Book> books = new HashMap<>();
+
+        String keys[]=new String[] {"热爱","喜欢","看过"};
+
+        for (int i = 0; i < 10; i++) {
+            Student student = new Student();
+            student.setId(12358);
+            student.setName("小玲");
+            student.setAge(25);
+
+            students.add(student);
+
+            Book book=new Book();
+            book.setName("《三国演义》");
+            book.setPrice(35.5);
+
+            books.put(keys[i%3], book);
+        }
+
+        teacher.setStudents(students);
+        teacher.setBooks(books);
+
+        return teacher;
     }
 
     private void requestPermission() {

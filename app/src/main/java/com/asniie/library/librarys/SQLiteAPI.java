@@ -11,8 +11,11 @@ public interface SQLiteAPI {
     @update("create table if not exists student (id int,age int,name varchar(20))")
     boolean createTable();
 
-    @query("select * from student where id = ${id };")
-    List<Person> queryById(@param("id") int name);
+    @query("SELECT * FROM student WHERE id = ${id}")
+    List<Student> queryById(@param("id") int id);
+
+    @query("SELECT * FROM student WHERE name = '${teacher.students.5.name}'")
+    List<Student> queryStudentByTeacher(@param("teacher") Teacher teacher);
 
     @query("select * from student where age = ${age} and name = '${name}';")
     List<Person> query(@param("name") String name, @param("age") int age);

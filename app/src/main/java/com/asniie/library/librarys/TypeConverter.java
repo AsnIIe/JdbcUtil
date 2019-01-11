@@ -29,18 +29,26 @@ public final class TypeConverter {
                 if (Primitives.wrap((Class<?>) to).equals(Boolean.class)) {
                     return stringToBoolean(src);
                 }
-                if (((Class<?>) to).isAssignableFrom(Number.class)) {
+                if (Number.class.isAssignableFrom((Class<?>) to)) {
                     return stringToNumber(src);
                 }
             } else if (src instanceof Boolean) {
                 if (Primitives.wrap((Class<?>) to).equals(String.class)) {
                     return booleanToString(src);
                 }
-                if (((Class<?>) to).isAssignableFrom(Number.class)) {
+                if (Number.class.isAssignableFrom((Class<?>) to)) {
                     return booleanToNumber(src);
                 }
             }
         }
+
+       /* boolean isSrcArray = ParameterizedType.class.isAssignableFrom(src.getClass());
+        boolean isToArray = to instanceof ParameterizedType || to instanceof GenericArrayType;
+
+        if (isSrcArray && !isToArray) {
+            src = ((List) src).get(0);
+        }*/
+
         return mGson.fromJson(mGson.toJson(src), to);
     }
 

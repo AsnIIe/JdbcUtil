@@ -6,6 +6,9 @@ import com.asniie.utils.sqlite.annotations.param;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,7 +16,7 @@ import java.util.regex.Pattern;
  * Created by XiaoWei on 2019/1/10.
  */
 public final class AnnotationParser {
-    private static final String REGEX_FIELD = "\\$\\s?\\{\\s?([^}]+)\\s?\\.\\s?([^}]+)\\s?\\}";
+    private static final String REGEX_FIELD = "\\$\\s?\\{\\s?(([^}]+\\s?\\.\\s?[^}]+)+)\\s?\\}";
 
     private static final Pattern PATTERN_FIELD = Pattern.compile(REGEX_FIELD);
 
@@ -47,39 +50,29 @@ public final class AnnotationParser {
     private static String parseField(String className, String temp, Object object) {
         Matcher matcher = PATTERN_FIELD.matcher(temp);
         while (matcher.find()) {
-            if (className.equals(matcher.group(1).trim())) {
-
-                String value = accessValue(object, matcher.group(2));
-
-                if (value != null) {
-                    temp = temp.replace(matcher.group(), value);
+            String[] attrs = matcher.group(1).trim().split("\\.");
+            if (className.equals(attrs[0])) {
+                Object value = object;
+                for (int i = 1; i < attrs.length; i++) {
+                    value = accessValue(value, attrs[i]);
                 }
+                temp = temp.replace(matcher.group(), escape(String.valueOf(value)));
             }
         }
         return temp;
     }
 
-    private static String accessValue(Object object, String name) {
+    private static Object accessValue(Object object, String param) {
         try {
-            Class<?> clazz = object.getClass();
-
-            Field field = clazz.getDeclaredField(name);
-
-            Class<?> type = field.getType();
-
-            boolean isBool = type.equals(boolean.class) || type.equals(Boolean.class);
-
-            Method method = clazz.getMethod(parseMethodName(name, isBool), new Class<?>[]{});
-
-            return escape(String.valueOf(method.invoke(object, new Object[]{})));
+            return parseValue(object, param);
         } catch (Exception e) {
             LogUtil.debug(e);
         }
-
         return null;
     }
 
     private static String escape(String str) {
+
         str = str.replace("/", "//");
         str = str.replace("'", "''");
         str = str.replace("[", "/[");
@@ -92,13 +85,37 @@ public final class AnnotationParser {
         return str;
     }
 
-
-    private static String parseMethodName(String methodName, boolean isBool) {
+    private static String parseMethodName(Object object, String methodName, boolean isBool) {
         methodName = methodName.replaceAll("\\s", "");
 
         char ch = methodName.charAt(0);
         String set = (isBool ? "is" : "get").concat(String.valueOf(Character.toUpperCase(ch)));
         return methodName.replaceFirst(String.valueOf(ch), set);
+    }
+
+    private static Object parseValue(Object object, String param) throws Exception {
+        Class<?> clazz = object.getClass();
+        Object obj = null;
+
+        if (object instanceof List) {
+            Method method = ArrayList.class.getDeclaredMethod("get", int.class);
+            obj = method.invoke(object, Integer.valueOf(param).intValue());
+        } else if (object instanceof Map) {
+            Method method = Map.class.getDeclaredMethod("get", Object.class);
+            obj = method.invoke(object, param);
+        } else {
+            Field field = clazz.getDeclaredField(param);
+
+            Class<?> type = field.getType();
+
+            boolean isBool = type.equals(boolean.class) || type.equals(Boolean.class);
+
+            Method method = clazz.getMethod(parseMethodName(object, param, isBool), new Class<?>[]{});
+
+            obj = method.invoke(object, new Object[]{});
+        }
+
+        return obj;
     }
 
     private static boolean check(String temp, Annotation[][] paramAnnotations, Object[] params) {
