@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         student.setId(100);
         student.setAge(30);
 
-        int count = api.insertStudents(persons,teacher.getStudents());
+        int count = api.insertStudents(persons, teacher.getStudents());
 
         view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count, api.queryStudentByTeacher(teacher, 5)));
 
@@ -79,9 +79,9 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < 10; i++) {
             Student student = new Student();
-            student.setId(12358);
-            student.setName("小玲-" + i);
-            student.setAge(25);
+            student.setId(12358 + i);
+            student.setName("小玲");
+            student.setAge(25 + i);
 
             students.add(student);
 
