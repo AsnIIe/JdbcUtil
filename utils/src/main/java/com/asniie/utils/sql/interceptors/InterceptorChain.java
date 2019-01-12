@@ -1,5 +1,7 @@
 package com.asniie.utils.sql.interceptors;
 
+import com.asniie.utils.sql.exception.DataBaseException;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,7 @@ public final class InterceptorChain {
         return mInterceptorsors.remove(index);
     }
 
-    public static Object intercept(String[] sqls, Interceptor.ExecType type, Type returnType) {
+    public static Object intercept(String[] sqls, Interceptor.ExecType type, Type returnType) throws DataBaseException {
         Object object = null;
         for (Interceptor interceptor : mInterceptorsors) {
             if (object == null) {

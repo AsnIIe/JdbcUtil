@@ -1,5 +1,7 @@
 package com.asniie.utils.sql.interceptors;
 
+import com.asniie.utils.sql.exception.DataBaseException;
+
 import java.lang.reflect.Type;
 
 /*
@@ -8,5 +10,5 @@ import java.lang.reflect.Type;
 public interface Interceptor {
     enum ExecType {UPDATE, QUERY}
 
-    Object intercept(String[] sqls, ExecType type, Type returnType);
+    Object intercept(String[] sqls, ExecType type, Type returnType) throws DataBaseException;
 }

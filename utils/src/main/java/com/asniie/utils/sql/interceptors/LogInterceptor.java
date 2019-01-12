@@ -1,6 +1,7 @@
 package com.asniie.utils.sql.interceptors;
 
 import com.asniie.utils.LogUtil;
+import com.asniie.utils.sql.exception.DataBaseException;
 
 import java.lang.reflect.Type;
 
@@ -11,7 +12,7 @@ public final class LogInterceptor extends AbstractInterceptor {
     public static boolean DEBUG = true;
 
     @Override
-    public Object intercept(String[] sqls, ExecType type, Type returnType) {
+    public Object intercept(String[] sqls, ExecType type, Type returnType) throws DataBaseException {
 
         if (DEBUG) {
             for (String sql : sqls) {

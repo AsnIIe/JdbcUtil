@@ -37,7 +37,7 @@ public final class AndroidSQLite extends AbstractInterceptor {
     }
 
     @Override
-    public Object intercept(String[] sqls, ExecType type, Type returnType) {
+    public Object intercept(String[] sqls, ExecType type, Type returnType) throws DataBaseException {
         SQLiteDatabase database = connect("database.db");
 
         Object object = null;
