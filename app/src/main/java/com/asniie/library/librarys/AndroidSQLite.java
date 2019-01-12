@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
 import com.asniie.utils.LogUtil;
-import com.asniie.utils.sqlite.core.InstanceProxy;
+import com.asniie.utils.sqlite.core.ObjectFactory;
 import com.asniie.utils.sqlite.exception.DataBaseException;
 import com.asniie.utils.sqlite.interceptors.AbstractInterceptor;
 import com.asniie.utils.sqlite.interceptors.InterceptorChain;
@@ -32,7 +32,7 @@ public final class AndroidSQLite extends AbstractInterceptor {
     }
 
     public static <T> T create(Class<T> clazz) {
-        return InstanceProxy.create(clazz);
+        return ObjectFactory.create(clazz);
     }
 
     @Override

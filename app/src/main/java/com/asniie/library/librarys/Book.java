@@ -1,9 +1,11 @@
 package com.asniie.library.librarys;
 
+import java.io.Serializable;
+
 /*
  * Created by XiaoWei on 2019/1/12.
  */
-public class Book {
+public class Book implements Serializable {
     private String name;
     private double price;
 

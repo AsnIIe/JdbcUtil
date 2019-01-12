@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         int n = random.nextInt(20) + 1;
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < 10; i++) {
             Person person = new Person();
             person.setAge(random.nextInt(12) + 15);
             person.setId(random.nextInt(1000));
@@ -49,11 +49,16 @@ public class MainActivity extends AppCompatActivity {
             persons.add(person);
         }
 
-        int count = api.insertStudents(persons);
 
         Teacher teacher = initTeacher();
 
-        view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count, api.queryStudentByTeacher(teacher)));
+        Student student = new Student();
+        student.setId(100);
+        student.setAge(30);
+
+        int count = api.insertStudents(persons,teacher.getStudents());
+
+        view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count, api.queryStudentByTeacher(teacher, 5)));
 
         LogUtil.debug(api.queryById(100));
 
@@ -61,9 +66,6 @@ public class MainActivity extends AppCompatActivity {
         person.setAge(18);
         person.setId(1);
         person.setName("小明");
-
-        Student student = new Student();
-        student.setId(100);
 
         LogUtil.debug(api.insert(person, student));
     }
@@ -73,21 +75,21 @@ public class MainActivity extends AppCompatActivity {
         List<Student> students = new ArrayList<>();
         Map<String, Book> books = new HashMap<>();
 
-        String keys[]=new String[] {"热爱","喜欢","看过"};
+        String keys[] = new String[]{"热爱", "喜欢", "看过"};
 
         for (int i = 0; i < 10; i++) {
             Student student = new Student();
             student.setId(12358);
-            student.setName("小玲");
+            student.setName("小玲-" + i);
             student.setAge(25);
 
             students.add(student);
 
-            Book book=new Book();
+            Book book = new Book();
             book.setName("《三国演义》");
             book.setPrice(35.5);
 
-            books.put(keys[i%3], book);
+            books.put(keys[i % 3], book);
         }
 
         teacher.setStudents(students);
