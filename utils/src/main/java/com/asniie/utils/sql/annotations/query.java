@@ -1,4 +1,4 @@
-package com.asniie.utils.sqlite.annotations;
+package com.asniie.utils.sql.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface update {
+public @interface query {
     String value();
 }

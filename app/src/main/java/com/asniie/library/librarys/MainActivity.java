@@ -60,14 +60,14 @@ public class MainActivity extends AppCompatActivity {
 
         view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count, api.queryStudentByTeacher(teacher, 5)));
 
-        LogUtil.debug(api.queryById(100));
+        api.queryById(100);
 
         Person person = new Person();
         person.setAge(18);
         person.setId(1);
         person.setName("小明");
 
-        LogUtil.debug(api.insert(person, student));
+        api.insert(person, student);
     }
 
     private Teacher initTeacher() {

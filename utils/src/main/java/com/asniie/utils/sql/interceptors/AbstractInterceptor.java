@@ -1,4 +1,4 @@
-package com.asniie.utils.sqlite.interceptors;
+package com.asniie.utils.sql.interceptors;
 
 import java.lang.reflect.Type;
 

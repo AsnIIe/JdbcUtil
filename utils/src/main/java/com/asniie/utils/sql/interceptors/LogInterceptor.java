@@ -1,4 +1,4 @@
-package com.asniie.utils.sqlite.interceptors;
+package com.asniie.utils.sql.interceptors;
 
 import com.asniie.utils.LogUtil;
 
@@ -15,7 +15,7 @@ public final class LogInterceptor extends AbstractInterceptor {
 
         if (DEBUG) {
             for (String sql : sqls) {
-                LogUtil.debug(sql);
+                LogUtil.debug("LogInterceptor : " + sql);
             }
         }
         return super.intercept(sqls, type, returnType);

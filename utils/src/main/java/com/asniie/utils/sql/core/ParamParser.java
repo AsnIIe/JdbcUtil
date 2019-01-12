@@ -1,6 +1,6 @@
-package com.asniie.utils.sqlite.core;
+package com.asniie.utils.sql.core;
 
-import com.asniie.utils.sqlite.annotations.param;
+import com.asniie.utils.sql.annotations.param;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Map;
 public final class ParamParser {
     private final ExpParser mExpParser = new ExpParser();
 
-    public String[] parseParamsToSQL(String sqlTemp, Annotation[][] paramAnnotations, Object[] params) {
+    public String[] parseSqls(String sqlTemp, Annotation[][] paramAnnotations, Object[] params) {
 
         Map<String, List<Object>> paramMap = new HashMap<>();
 

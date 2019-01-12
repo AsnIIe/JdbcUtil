@@ -1,10 +1,10 @@
-package com.asniie.utils.sqlite.core;
+package com.asniie.utils.sql.core;
 
-import com.asniie.utils.sqlite.annotations.query;
-import com.asniie.utils.sqlite.annotations.update;
-import com.asniie.utils.sqlite.exception.DataBaseException;
-import com.asniie.utils.sqlite.interceptors.Interceptor;
-import com.asniie.utils.sqlite.interceptors.InterceptorChain;
+import com.asniie.utils.sql.annotations.query;
+import com.asniie.utils.sql.annotations.update;
+import com.asniie.utils.sql.exception.DataBaseException;
+import com.asniie.utils.sql.interceptors.Interceptor;
+import com.asniie.utils.sql.interceptors.InterceptorChain;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -40,7 +40,6 @@ public final class ObjectFactory implements InvocationHandler {
         return exec(method, args);
     }
 
-    @SuppressWarnings("unchecked")
     private Object exec(Method method, Object[] objects) {
 
         Annotation[] annotations = method.getAnnotations();
@@ -51,8 +50,8 @@ public final class ObjectFactory implements InvocationHandler {
             Type returnType = method.getGenericReturnType();
 
             for (Annotation annotation : annotations) {
-                String sqlTemp = null;
-                Interceptor.ExecType execType = null;
+                String sqlTemp;
+                Interceptor.ExecType execType;
                 if (annotation instanceof update) {
                     sqlTemp = ((update) annotation).value();
                     execType = Interceptor.ExecType.UPDATE;
@@ -64,7 +63,7 @@ public final class ObjectFactory implements InvocationHandler {
                     continue;
                 }
 
-                String[] sqls = mParamParser.parseParamsToSQL(sqlTemp, paramAnnotations, objects);
+                String[] sqls = mParamParser.parseSqls(sqlTemp, paramAnnotations, objects);
 
                 return InterceptorChain.intercept(sqls, execType, returnType);
             }

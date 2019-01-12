@@ -1,4 +1,4 @@
-package com.asniie.utils.sqlite.exception;
+package com.asniie.utils.sql.exception;
 
 /*
  * Created by XiaoWei on 2019/1/9.

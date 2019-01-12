@@ -1,8 +1,8 @@
 package com.asniie.library.librarys;
 
-import com.asniie.utils.sqlite.annotations.param;
-import com.asniie.utils.sqlite.annotations.query;
-import com.asniie.utils.sqlite.annotations.update;
+import com.asniie.utils.sql.annotations.param;
+import com.asniie.utils.sql.annotations.query;
+import com.asniie.utils.sql.annotations.update;
 
 import java.util.List;
 

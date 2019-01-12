@@ -5,10 +5,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
 import com.asniie.utils.LogUtil;
-import com.asniie.utils.sqlite.core.ObjectFactory;
-import com.asniie.utils.sqlite.exception.DataBaseException;
-import com.asniie.utils.sqlite.interceptors.AbstractInterceptor;
-import com.asniie.utils.sqlite.interceptors.InterceptorChain;
+import com.asniie.utils.UnicodeUtil;
+import com.asniie.utils.sql.core.ObjectFactory;
+import com.asniie.utils.sql.exception.DataBaseException;
+import com.asniie.utils.sql.interceptors.AbstractInterceptor;
+import com.asniie.utils.sql.interceptors.InterceptorChain;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +73,6 @@ public final class AndroidSQLite extends AbstractInterceptor {
 
         if (database != null && database.isOpen()) {
             database.close();
-            database = null;
         }
 
         return TypeConverter.convert(object, returnType);
@@ -86,7 +86,6 @@ public final class AndroidSQLite extends AbstractInterceptor {
             method.setAccessible(true);
             count = (int) method.invoke(db, sql, null);
         }
-
         return count;
     }
 
@@ -118,7 +117,7 @@ public final class AndroidSQLite extends AbstractInterceptor {
 
                 switch (type) {
                     case Cursor.FIELD_TYPE_STRING:
-                        map.put(key, cursor.getString(i));
+                        map.put(key, UnicodeUtil.decodeUnicode(cursor.getString(i)));
                         break;
                     case Cursor.FIELD_TYPE_INTEGER:
                         map.put(key, cursor.getInt(i));

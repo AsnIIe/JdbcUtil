@@ -1,6 +1,6 @@
-package com.asniie.utils.sqlite.core;
+package com.asniie.utils.sql.core;
 
-import com.asniie.utils.sqlite.exception.ValueReadException;
+import com.asniie.utils.sql.exception.ValueReadException;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -10,6 +10,7 @@ import java.util.Map;
 
 /*
  * Created by XiaoWei on 2019/1/12.
+ * 仅支持三种格式数据传入List、Map、Serializable
  */
 public final class ValueReader {
 
