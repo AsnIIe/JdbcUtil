@@ -71,7 +71,7 @@ public final class ExpParser {
                     level++;
                     buffer.append(token);
                     buffer.append('.');
-                } else if (token.endsWith("}") && !token.startsWith("$")) {//以endsWith为优先级
+                } else if (token.endsWith("}") && !token.startsWith("$")) {
                     level--;
                     buffer.append(token);
                     if (level == 0 || token.endsWith(buildEnds(level))) {
@@ -95,10 +95,14 @@ public final class ExpParser {
                         }
                     }
                 } else {
-                    tokens.add(token);
+                    if (level == 0) {
+                        tokens.add(token);
+                    } else {
+                        buffer.append(token);
+                        buffer.append(".");
+                    }
                 }
             }
-
             //LogUtil.debug(tokens);
             Object object = findObjectByKey(tokens.get(0));
 
