@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
 import com.asniie.utils.LogUtil;
+import com.asniie.utils.sql.SqlEscape;
 import com.asniie.utils.sql.core.ObjectFactory;
 import com.asniie.utils.sql.exception.DataBaseException;
 import com.asniie.utils.sql.interceptors.AbstractInterceptor;
@@ -116,7 +117,7 @@ public final class AndroidSQLite extends AbstractInterceptor {
 
                 switch (type) {
                     case Cursor.FIELD_TYPE_STRING:
-                        map.put(key, cursor.getString(i));
+                        map.put(key, SqlEscape.unescape(cursor.getString(i)));
                         break;
                     case Cursor.FIELD_TYPE_INTEGER:
                         map.put(key, cursor.getInt(i));

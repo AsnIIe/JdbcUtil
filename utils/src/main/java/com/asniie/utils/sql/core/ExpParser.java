@@ -1,5 +1,6 @@
 package com.asniie.utils.sql.core;
 
+import com.asniie.utils.sql.SqlEscape;
 import com.asniie.utils.sql.exception.ExpParseException;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public final class ExpParser {
 
                 while (matcher.find()) {
                     String expression = matcher.group().replaceAll("\\s", "");
-                    String value = escape(parseExp(expression));
+                    String value = SqlEscape.escape(parseExp(expression));
                     sql = sql.replace(matcher.group(), value);
                 }
                 //LogUtil.debug("sqls--> " + sql);
@@ -128,6 +129,20 @@ public final class ExpParser {
         return count;
     }
 
+    private String buildEnds(int count) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i <= count; i++) {
+            builder.append('}');
+        }
+        return builder.toString();
+    }
+
+    private Object findObjectByKey(String key) {
+        List<Object> objects = mParamMap.get(key);
+        int size = objects.size();
+        return size > mIndex ? objects.get(mIndex) : objects.get(size - 1);
+    }
+
     /*//计算等级
     private int countLevel(String token) {
         char[] chars = token.toCharArray();
@@ -143,30 +158,4 @@ public final class ExpParser {
         return level;
     }*/
 
-    private String buildEnds(int count) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i <= count; i++) {
-            builder.append('}');
-        }
-        return builder.toString();
-    }
-
-    private Object findObjectByKey(String key) {
-        List<Object> objects = mParamMap.get(key);
-        int size = objects.size();
-        return size > mIndex ? objects.get(mIndex) : objects.get(size - 1);
-    }
-
-    private String escape(String str) {
-        str = str.replace("/", "//");
-        str = str.replace("'", "''");
-        str = str.replace("[", "/[");
-        str = str.replace("]", "/]");
-        str = str.replace("%", "/%");
-        str = str.replace("&", "/&");
-        str = str.replace("_", "/_");
-        str = str.replace("(", "/(");
-        str = str.replace(")", "/)");
-        return str;
-    }
 }
