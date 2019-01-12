@@ -44,7 +44,7 @@ public final class ExpParser {
                 sqlArray.add(sql);
                 matcher.reset();//重置正则匹配
             }
-            break;
+            break;//以的第一个List的size为准
         }
         //LogUtil.debug("sqls.size--> " + sqlArray.size());
         return sqlArray.toArray(new String[]{});
@@ -78,10 +78,12 @@ public final class ExpParser {
             int size = objects.size();
             Object object = size > mIndex ? objects.get(mIndex) : objects.get(size - 1);
 
-            for (int i = 1; i < tokens.size(); i++) {
-                object = mValueReader.readValue(object, parseExp(tokens.get(i)));
+            if (object != null) {
+                for (int i = 1; i < tokens.size(); i++) {
+                    object = mValueReader.readValue(object, parseExp(tokens.get(i)));
+                }
+                return object.toString();
             }
-            return object.toString();
         }
         return expression;
     }
