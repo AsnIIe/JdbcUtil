@@ -78,12 +78,10 @@ public final class ExpParser {
             int size = objects.size();
             Object object = size > mIndex ? objects.get(mIndex) : objects.get(size - 1);
 
-            if (object != null) {
-                for (int i = 1; i < tokens.size(); i++) {
-                    object = mValueReader.readValue(object, parseExp(tokens.get(i)));
-                }
-                return object.toString();
+            for (int i = 1; i < tokens.size(); i++) {
+                object = mValueReader.readValue(object, parseExp(tokens.get(i)));
             }
+            return object.toString();
         }
         return expression;
     }

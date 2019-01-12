@@ -36,7 +36,7 @@ public final class ValueReader {
             throw new ValueReadException(e);
         }
 
-        throw new IllegalArgumentException("the target interface's params must be java.util.List or java.util.Map or java.io.Serializable");
+        throw new IllegalArgumentException("the target interface's method params must be java.util.List or java.util.Map or java.io.Serializable");
     }
 
     private String parseSerializableMethodName(Object object, String methodName, boolean isBool) {
