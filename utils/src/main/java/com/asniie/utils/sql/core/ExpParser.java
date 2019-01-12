@@ -1,6 +1,5 @@
 package com.asniie.utils.sql.core;
 
-import com.asniie.utils.UnicodeUtil;
 import com.asniie.utils.sql.exception.ExpParseException;
 
 import java.util.ArrayList;
@@ -159,20 +158,7 @@ public final class ExpParser {
     }
 
     private String escape(String str) {
-        str = str.toLowerCase();//统一转为小写
-        String sqlWords = "'|and|exec|execute|insert|select|delete|update|count|drop|*|%|chr|mid|master|truncate|" +
-                "char|declare|sitename|net user|xp_cmdshell|;|or|-|+|,|like'|and|exec|execute|insert|create|drop|" +
-                "table|from|grant|use|group_concat|column_name|" +
-                "information_schema.columns|table_schema|union|where|select|delete|update|order|by|count|*|" +
-                "chr|mid|master|truncate|char|declare|or|;|-|--|+|,|like|//|/|%|#";//过滤掉的sql关键字，可以手动添加
-        String[] badStrs = sqlWords.split("\\|");
-        for (String key : badStrs) {
-            if (str.contains(key)) {
-                str = str.replace(key, UnicodeUtil.encode(key));
-            }
-        }
-        return str;
-        /*str = str.replace("/", "//");
+        str = str.replace("/", "//");
         str = str.replace("'", "''");
         str = str.replace("[", "/[");
         str = str.replace("]", "/]");
@@ -181,6 +167,6 @@ public final class ExpParser {
         str = str.replace("_", "/_");
         str = str.replace("(", "/(");
         str = str.replace(")", "/)");
-        return str;*/
+        return str;
     }
 }
