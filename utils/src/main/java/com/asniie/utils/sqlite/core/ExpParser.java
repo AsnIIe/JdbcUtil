@@ -75,7 +75,8 @@ public final class ExpParser {
 
             String key = tokens.get(0);
             List<Object> objects = mParamMap.get(key);
-            Object object = objects.size() > mIndex ? objects.get(mIndex) : objects.get(0);
+            int size = objects.size();
+            Object object = size > mIndex ? objects.get(mIndex) : objects.get(size - 1);
 
             for (int i = 1; i < tokens.size(); i++) {
                 object = mValueReader.readValue(object, parseExp(tokens.get(i)));
