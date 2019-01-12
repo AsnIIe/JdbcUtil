@@ -44,9 +44,12 @@ public final class ParamParser {
                     }
                 }
             }
-        } else {
+        }
+
+        if (paramMap.isEmpty()) {
             return new String[]{sqlTemp};
         }
+
         return mExpParser.parseExpression(sqlTemp, paramMap);
     }
 
