@@ -39,7 +39,7 @@ public final class ValueReader {
             throw new ValueReadException(e);
         }
 
-        throw new IllegalArgumentException("the target interface's method params must be Array or List or Map or Serializable");
+        throw new IllegalArgumentException("Interface method parameters must be Array or List or Map or Serializable.You passed in a " + object.getClass());
     }
 
     private String parseSerializableMethodName(Object object, String methodName, boolean isBool) {

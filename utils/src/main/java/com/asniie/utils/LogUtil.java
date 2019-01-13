@@ -8,10 +8,6 @@ import android.util.Log;
 public class LogUtil {
     public static String TAG = "LogUtil";
 
-    public static void setTAG(String TAG) {
-        LogUtil.TAG = TAG;
-    }
-
     public static void debug(Object obj) {
         if (obj instanceof Throwable) {
             Throwable throwable = (Throwable) obj;
@@ -19,10 +15,6 @@ public class LogUtil {
         } else {
             Log.i(TAG, format(obj));
         }
-    }
-
-    public static void print(Object obj) {
-        Log.i(TAG, format(obj));
     }
 
     private static String format(Object obj) {

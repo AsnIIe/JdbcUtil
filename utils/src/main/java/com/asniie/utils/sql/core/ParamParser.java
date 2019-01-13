@@ -28,7 +28,7 @@ public final class ParamParser {
                     if (annotation instanceof param) {
 
                         param paramAnnotation = (param) annotation;
-                        String className = paramAnnotation.value();
+                        String paramName = paramAnnotation.value();
                         Object param = params[i];
 
                         Class<?> paramType = param.getClass();
@@ -50,7 +50,7 @@ public final class ParamParser {
                         int size = paramArray.size();
                         //以size最大的List为标准
                         sqlSize = sqlSize > size ? sqlSize : size;
-                        paramMap.put(className, paramArray);
+                        paramMap.put(paramName, paramArray);
                     }
                 }
             }
