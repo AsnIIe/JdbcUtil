@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asniie.utils.LogUtil;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         int count = api.insertStudents(persons, teacher.getStudents());
 
-        view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count, api.queryStudentByTeacher(teacher, 5)));
+        view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count, api.queryStudentByTeacher(teacher, new int[]{25, 26, 27, 28, 29, 30}, 5)));
 
         api.queryById(100);
 

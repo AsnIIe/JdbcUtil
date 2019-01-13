@@ -1,19 +1,20 @@
 package com.asniie.utils.sql.core;
 
+import com.asniie.utils.LogUtil;
 import com.asniie.utils.sql.SqlEscape;
 import com.asniie.utils.sql.exception.ExpParseException;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /*
  * Created by XiaoWei on 2019/1/12.
- * 不要嵌套太复杂
- * 特别是不要在一个变量外嵌套两层表达式包裹。如${${index}}会出错，${array.${index}}不出错
+ * (已经修复)不要嵌套太复杂
+ * (已经修复)特别是不要在一个变量外嵌套两层表达式包裹。如${${index}}会出错，${mList.${index}}不出错
  * SQL需按语法书写
  */
 public final class ExpParser {
@@ -39,118 +40,77 @@ public final class ExpParser {
             String sql = sqlTemp;
 
             while (matcher.find()) {
-                String expression = matcher.group().replaceAll("\\s", "");
-                String value = SqlEscape.escape(parseExp(expression));
-                sql = sql.replace(matcher.group(), value);
+                String body = matcher.group();
+                String value = SqlEscape.escape(parseExp(body.replaceAll("\\s", "")));
+                sql = sql.replace(body, value);
             }
-            //LogUtil.debug("sqls--> " + sql);
             sqlList.add(sql);
             matcher.reset();//重置正则匹配
         }
         return sqlList.toArray(new String[]{});
     }
 
-    //${teacher.students.${index}.name}
+    //${teacher.students.${${${index}}}.name}
     private String parseExp(String expression) {
         Matcher matcher = PATTERN.matcher(expression);
 
         if (matcher.find()) {
-            List<String> tokens = new ArrayList<>();
-            StringBuilder buffer = new StringBuilder();
-            StringTokenizer tokenizer = new StringTokenizer(matcher.group(1), ".", false);
+            String unwrap = unwrap(matcher.group(1));
+            LogUtil.debug("ExpParser : peek---->" + unwrap);
+            ExpReader reader = new ExpReader(unwrap);
+            String[] items = reader.peek();
+            reader.close();
 
-            int level = 0;
-            while (tokenizer.hasMoreElements()) {
-                String token = tokenizer.nextToken();
-                //  LogUtil.debug(token);
+            Object object = findObjectByKey(items[0]);
 
-                if (token.startsWith("$") && !token.endsWith("}")) {
-                    level++;
-                    buffer.append(token);
-                    buffer.append('.');
-                } else if (token.endsWith("}") && !token.startsWith("$")) {
-                    level--;
-                    buffer.append(token);
-                    if (level == 0 || token.endsWith(buildEnds(level))) {
-                        tokens.add(buffer.toString());
-                        level = 0;
-                    } else {
-                        buffer.append('.');
-                    }
-                } else if (token.startsWith("$") && token.endsWith("}")) {
-                    if (level == 0) {
-                        tokens.add(token);
-                    } else {
-                        if (token.endsWith(buildEnds(level))) {
-                            buffer.append(token);
-                            tokens.add(buffer.toString());
-                            level = 0;
-                        } else {
-                            buffer.append(token);
-                            buffer.append(".");
-                            level -= endsCount(token);
-                        }
-                    }
-                } else {
-                    if (level == 0) {
-                        tokens.add(token);
-                    } else {
-                        buffer.append(token);
-                        buffer.append(".");
-                    }
-                }
+            for (int i = 1; i < items.length; i++) {
+                object = mValueReader.readValue(object, parseExp(items[i]));
             }
-            //LogUtil.debug(tokens);
-            Object object = findObjectByKey(tokens.get(0));
-
-            for (int i = 1; i < tokens.size(); i++) {
-                object = mValueReader.readValue(object, parseExp(tokens.get(i)));
-            }
-            return object.toString();
+            return formatObject(object);
         }
         return expression;
     }
 
-    //计算‘}’数量
-    private int endsCount(String token) {
-        char[] chars = token.toCharArray();
-        int count = 0;
-
-        for (char ch : chars) {
-            if (ch == '}') {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private String buildEnds(int count) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i <= count; i++) {
-            builder.append('}');
-        }
-        return builder.toString();
-    }
-
     private Object findObjectByKey(String key) {
+        LogUtil.debug("ExpParser : objectKey = " + key);
         List<Object> objects = mParamMap.get(key);
         int size = objects.size();
         return size > mIndex ? objects.get(mIndex) : objects.get(size - 1);
     }
 
-    /*//计算等级
-    private int countLevel(String token) {
-        char[] chars = token.toCharArray();
-        int level = 0;
-
-        for (char ch : chars) {
-            if (ch == '}') {
-                level--;
-            } else if (ch == '$') {
-                level++;
+    private String unwrap(String peek) {
+        if (peek.startsWith("${")) {
+            Matcher matcher = PATTERN.matcher(peek);
+            if (matcher.find()) {
+                peek = unwrap(matcher.group(1));
             }
         }
-        return level;
-    }*/
+        return peek;
+    }
+
+    private String formatObject(Object object) {
+        StringBuilder builder = new StringBuilder();
+        if (object.getClass().isArray()) {
+            int length = Array.getLength(object);
+            for (int j = 0; j < length; j++) {
+                builder.append(Array.get(object, j));
+                if (j != length - 1) {
+                    builder.append(',');
+                }
+            }
+        } else if (object instanceof List) {
+            List objects = ((List) object);
+            int size = objects.size();
+            for (int j = 0; j < size; j++) {
+                builder.append(Array.get(object, j));
+                if (j != size - 1) {
+                    builder.append(',');
+                }
+            }
+        } else {
+            return object.toString();
+        }
+        return builder.toString();
+    }
 
 }

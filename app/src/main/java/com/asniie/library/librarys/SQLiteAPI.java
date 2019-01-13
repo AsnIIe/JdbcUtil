@@ -14,8 +14,10 @@ public interface SQLiteAPI {
     @query("SELECT * FROM student WHERE id = ${id}")
     List<Student> queryById(@param("id") int id);
 
-    @query("SELECT * FROM student WHERE name = '${teacher.students.${index }.name}'")
-    List<Student> queryStudentByTeacher(@param("teacher") Teacher teacher, @param("index") int index);
+    @query("SELECT * FROM student WHERE name = '${teacher.students.${index}.name}' AND age IN (${numbers})")
+    List<Student> queryStudentByTeacher(@param("teacher") Teacher teacher,
+                                        @param(value = "numbers", origin = true) int[] age,
+                                        @param("index") int index);
 
     @query("select * from student where age = ${age} and name = '${name}';")
     List<Person> query(@param("name") String name, @param("age") int age);

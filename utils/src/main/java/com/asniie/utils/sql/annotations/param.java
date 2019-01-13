@@ -11,4 +11,6 @@ import java.lang.annotation.Target;
 @Documented
 public @interface param {
     String value();
+
+    boolean origin() default false;//针对数组、List等，是否使用原始值
 }

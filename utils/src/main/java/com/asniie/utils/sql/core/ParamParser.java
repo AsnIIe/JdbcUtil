@@ -3,8 +3,8 @@ package com.asniie.utils.sql.core;
 import com.asniie.utils.sql.annotations.param;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +33,20 @@ public final class ParamParser {
 
                         Class<?> paramType = param.getClass();
                         List<Object> paramArray = new ArrayList<>(5);
-                        if (paramType.isArray()) {
-                            paramArray = Arrays.asList((Object[]) param);
-                        } else if (List.class.isAssignableFrom(paramType)) {
-                            paramArray = (List<Object>) param;
+                        if (!paramAnnotation.origin()) {
+                            if (paramType.isArray()) {
+                                int length = Array.getLength(param);
+                                for (int j = 0; j < length; j++) {
+                                    paramArray.add(Array.get(param, j));
+                                }
+                            } else if (List.class.isAssignableFrom(paramType)) {
+                                paramArray = (List<Object>) param;
+                            } else {
+                                paramArray.add(param);
+                            }
                         } else {
                             paramArray.add(param);
                         }
-
                         int size = paramArray.size();
                         //以size最大的List为标准
                         sqlSize = sqlSize > size ? sqlSize : size;

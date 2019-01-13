@@ -3,6 +3,7 @@ package com.asniie.utils.sql.core;
 import com.asniie.utils.sql.exception.ValueReadException;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -10,16 +11,17 @@ import java.util.Map;
 
 /*
  * Created by XiaoWei on 2019/1/12.
- * 仅支持三种格式数据传入List、Map、Serializable
+ * 仅支持四种格式数据传入Array、List、Map、Serializable
  */
 public final class ValueReader {
 
     public Object readValue(Object object, String param) throws ValueReadException {
         try {
             Class<?> clazz = object.getClass();
-
-            if (object instanceof List) {
-                return ((List) object).get(Integer.valueOf(param).intValue());
+            if (clazz.isArray()) {
+                return Array.get(object, Integer.valueOf(param));
+            } else if (object instanceof List) {
+                return ((List) object).get(Integer.valueOf(param));
             } else if (object instanceof Map) {
                 return ((Map) object).get(param);
             } else if (object instanceof Serializable) {
@@ -37,7 +39,7 @@ public final class ValueReader {
             throw new ValueReadException(e);
         }
 
-        throw new IllegalArgumentException("the target interface's method params must be java.util.List or java.util.Map or java.io.Serializable");
+        throw new IllegalArgumentException("the target interface's method params must be Array or List or Map or Serializable");
     }
 
     private String parseSerializableMethodName(Object object, String methodName, boolean isBool) {
