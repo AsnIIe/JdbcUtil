@@ -19,6 +19,7 @@ public final class ParamParser {
 
         Map<String, List<Object>> paramMap = new HashMap<>();
 
+        int sqlSize = 0;
         if (check(sqlTemp, paramAnnotations, params)) {
             for (int i = 0; i < paramAnnotations.length; i++) {
                 Annotation[] annotations = paramAnnotations[i];
@@ -40,6 +41,9 @@ public final class ParamParser {
                             paramArray.add(param);
                         }
 
+                        int size = paramArray.size();
+                        //以size最大的List为标准
+                        sqlSize = sqlSize > size ? sqlSize : size;
                         paramMap.put(className, paramArray);
                     }
                 }
@@ -50,7 +54,7 @@ public final class ParamParser {
             return new String[]{sqlTemp};
         }
 
-        return mExpParser.parseExpression(sqlTemp, paramMap);
+        return mExpParser.parseExpression(sqlTemp, paramMap, sqlSize);
     }
 
     private boolean check(String temp, Annotation[][] paramAnnotations, Object[] params) {

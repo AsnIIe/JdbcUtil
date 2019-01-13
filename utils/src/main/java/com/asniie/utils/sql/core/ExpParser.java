@@ -27,30 +27,25 @@ public final class ExpParser {
 
     private int mIndex = 0;
 
-    public String[] parseExpression(String sqlTemp, Map<String, List<Object>> paramMap) throws ExpParseException {
+    public String[] parseExpression(String sqlTemp, Map<String, List<Object>> paramMap, int sqlSize) throws ExpParseException {
         List<String> sqlList = new ArrayList<>();
 
         this.mParamMap = paramMap;
 
         Matcher matcher = PATTERN.matcher(sqlTemp);
 
-        for (String className : paramMap.keySet()) {
-            int size = paramMap.get(className).size();
+        for (int i = 0; i < sqlSize; i++) {
+            mIndex = i;
+            String sql = sqlTemp;
 
-            for (int i = 0; i < size; i++) {
-                mIndex = i;
-                String sql = sqlTemp;
-
-                while (matcher.find()) {
-                    String expression = matcher.group().replaceAll("\\s", "");
-                    String value = SqlEscape.escape(parseExp(expression));
-                    sql = sql.replace(matcher.group(), value);
-                }
-                //LogUtil.debug("sqls--> " + sql);
-                sqlList.add(sql);
-                matcher.reset();//重置正则匹配
+            while (matcher.find()) {
+                String expression = matcher.group().replaceAll("\\s", "");
+                String value = SqlEscape.escape(parseExp(expression));
+                sql = sql.replace(matcher.group(), value);
             }
-            break;//以的第一个List的size为准
+            //LogUtil.debug("sqls--> " + sql);
+            sqlList.add(sql);
+            matcher.reset();//重置正则匹配
         }
         return sqlList.toArray(new String[]{});
     }
