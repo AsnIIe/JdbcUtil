@@ -1,6 +1,5 @@
 package com.asniie.utils.sql.core;
 
-import com.asniie.utils.LogUtil;
 import com.asniie.utils.sql.SqlEscape;
 import com.asniie.utils.sql.exception.ExpParseException;
 
@@ -56,7 +55,7 @@ public final class ExpParser {
 
         if (matcher.find()) {
             String unwrap = unwrap(matcher.group(1));
-            LogUtil.debug("ExpParser : peek---->" + unwrap);
+            //LogUtil.debug("ExpParser : peek---->" + unwrap);
             ExpReader reader = new ExpReader(unwrap);
             String[] items = reader.peek();
             reader.close();
@@ -72,7 +71,7 @@ public final class ExpParser {
     }
 
     private Object findObjectByKey(String key) {
-        LogUtil.debug("ExpParser : objectKey = " + key);
+        //LogUtil.debug("ExpParser : objectKey = " + key);
         List<Object> objects = mParamMap.get(key);
         int size = objects.size();
         return size > mIndex ? objects.get(mIndex) : objects.get(size - 1);
