@@ -1,7 +1,7 @@
 package com.asniie.utils.sql.core;
 
-import com.asniie.utils.sql.annotations.query;
-import com.asniie.utils.sql.annotations.update;
+import com.asniie.utils.sql.annotations.Update;
+import com.asniie.utils.sql.annotations.Query;
 import com.asniie.utils.sql.exception.DataBaseException;
 import com.asniie.utils.sql.interceptors.Interceptor;
 import com.asniie.utils.sql.interceptors.InterceptorChain;
@@ -52,12 +52,12 @@ public final class ObjectFactory implements InvocationHandler {
             for (Annotation annotation : annotations) {
                 String sqlTemp;
                 Interceptor.ExecType execType;
-                if (annotation instanceof update) {
-                    sqlTemp = ((update) annotation).value();
+                if (annotation instanceof Update) {
+                    sqlTemp = ((Update) annotation).value();
                     execType = Interceptor.ExecType.UPDATE;
 
-                } else if (annotation instanceof query) {
-                    sqlTemp = ((query) annotation).value();
+                } else if (annotation instanceof Query) {
+                    sqlTemp = ((Query) annotation).value();
                     execType = Interceptor.ExecType.QUERY;
                 } else {
                     continue;

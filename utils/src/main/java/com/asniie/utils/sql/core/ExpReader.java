@@ -28,7 +28,7 @@ public final class ExpReader extends StringReader {
     }
 
     public String[] peek() {
-        List<String> mList = new ArrayList<>();
+        List<String> mList = new ArrayList<>(10);
         try {
             int buf;
             while ((buf = read()) != -1) {

@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         int count = api.insertStudents(persons, teacher.getStudents());
 
-        view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count, api.queryStudentByTeacher(teacher, new int[]{25, 26, 27, 28, 29, 30}, 5)));
+        view.setText(String.format("插入数据：%d条,\n通过Teacher查询Student：\n%s", count,api.queryStudentByTeacher(teacher, new int[]{25, 26, 27, 28, 29, 30}, 5)));
 
         api.queryById(100);
 

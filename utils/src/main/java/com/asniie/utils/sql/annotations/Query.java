@@ -6,11 +6,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.PARAMETER)
+/*
+ * Created by XiaoWei on 2019/1/9.
+ */
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface param {
+public @interface Query {
     String value();
-
-    boolean origin() default false;//针对数组、List等，是否使用原始值
 }

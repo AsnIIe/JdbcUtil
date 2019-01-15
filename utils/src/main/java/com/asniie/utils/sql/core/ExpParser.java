@@ -61,7 +61,6 @@ public final class ExpParser {
             reader.close();
 
             Object object = findObjectByKey(items[0]);
-
             for (int i = 1; i < items.length; i++) {
                 object = mValueReader.readValue(object, parseExp(items[i]));
             }

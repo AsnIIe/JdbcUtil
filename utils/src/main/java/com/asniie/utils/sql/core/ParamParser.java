@@ -1,6 +1,7 @@
 package com.asniie.utils.sql.core;
 
-import com.asniie.utils.sql.annotations.param;
+import com.asniie.utils.sql.annotations.Param;
+import com.asniie.utils.sql.annotations.Params;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -15,38 +16,40 @@ import java.util.Map;
 public final class ParamParser {
     private final ExpParser mExpParser = new ExpParser();
 
-    public String[] parseSqls(String sqlTemp, Annotation[][] paramAnnotations, Object[] params) {
+    public String[] parseSqls(String sqlTemp, Annotation[][] paramAnnotations, Object[] objects) {
 
         Map<String, List<Object>> paramMap = new HashMap<>();
 
         int sqlSize = 0;
-        if (check(sqlTemp, paramAnnotations, params)) {
+        if (check(sqlTemp, paramAnnotations, objects)) {
             for (int i = 0; i < paramAnnotations.length; i++) {
                 Annotation[] annotations = paramAnnotations[i];
 
+                List<Object> paramArray = new ArrayList<>(5);
+                String paramName = null;
                 for (Annotation annotation : annotations) {
-                    if (annotation instanceof param) {
+                    if (annotation instanceof Param) {
+                        Param paramAnnotation = (Param) annotation;
+                        paramName = paramAnnotation.value();
 
-                        param paramAnnotation = (param) annotation;
-                        String paramName = paramAnnotation.value();
-                        Object param = params[i];
+                        paramArray.add(objects[i]);
+                    } else if (annotation instanceof Params) {
+                        Params paramAnnotation = (Params) annotation;
+                        paramName = paramAnnotation.value();
 
-                        Class<?> paramType = param.getClass();
-                        List<Object> paramArray = new ArrayList<>(5);
-                        if (!paramAnnotation.origin()) {
-                            if (paramType.isArray()) {
-                                int length = Array.getLength(param);
-                                for (int j = 0; j < length; j++) {
-                                    paramArray.add(Array.get(param, j));
-                                }
-                            } else if (List.class.isAssignableFrom(paramType)) {
-                                paramArray = (List<Object>) param;
-                            } else {
-                                paramArray.add(param);
+                        Object paramValue = objects[i];
+                        Class<?> paramType = paramValue.getClass();
+                        if (paramType.isArray()) {
+                            int length = Array.getLength(paramValue);
+                            for (int j = 0; j < length; j++) {
+                                paramArray.add(Array.get(paramValue, j));
                             }
-                        } else {
-                            paramArray.add(param);
+                        } else if (List.class.isAssignableFrom(paramType)) {
+                            paramArray = (List<Object>) paramValue;
                         }
+                    }
+
+                    if (paramName != null) {
                         int size = paramArray.size();
                         //以size最大的List为标准
                         sqlSize = sqlSize > size ? sqlSize : size;

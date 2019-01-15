@@ -31,7 +31,7 @@ public final class ValueReader {
 
                 boolean isBool = type.equals(boolean.class) || type.equals(Boolean.class);
 
-                Method method = clazz.getMethod(parseSerializableMethodName(object, param, isBool), new Class<?>[]{});
+                Method method = clazz.getMethod(parseSerializableMethodName(param, isBool), new Class<?>[]{});
 
                 return method.invoke(object, new Object[]{});
             }
@@ -42,11 +42,11 @@ public final class ValueReader {
         throw new IllegalArgumentException("Interface method parameters must be Array or List or Map or Serializable.You passed in a " + object.getClass());
     }
 
-    private String parseSerializableMethodName(Object object, String methodName, boolean isBool) {
+    private String parseSerializableMethodName(String methodName, boolean isBool) {
         methodName = methodName.replaceAll("\\s", "");
 
         char ch = methodName.charAt(0);
-        String set = (isBool ? "is" : "get").concat(String.valueOf(Character.toUpperCase(ch)));
-        return methodName.replaceFirst(String.valueOf(ch), set);
+        String get = (isBool ? "is" : "get").concat(String.valueOf(Character.toUpperCase(ch)));
+        return methodName.replaceFirst(String.valueOf(ch), get);
     }
 }

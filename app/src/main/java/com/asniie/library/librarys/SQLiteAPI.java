@@ -1,30 +1,31 @@
 package com.asniie.library.librarys;
 
-import com.asniie.utils.sql.annotations.param;
-import com.asniie.utils.sql.annotations.query;
-import com.asniie.utils.sql.annotations.update;
+import com.asniie.utils.sql.annotations.Param;
+import com.asniie.utils.sql.annotations.Params;
+import com.asniie.utils.sql.annotations.Query;
+import com.asniie.utils.sql.annotations.Update;
 
 import java.util.List;
 
 public interface SQLiteAPI {
 
-    @update("create table if not exists student (id int,age int,name varchar(20))")
+    @Update("create table if not exists student (id int,age int,name varchar(20))")
     boolean createTable();
 
-    @query("SELECT * FROM student WHERE id = ${id}")
-    List<Student> queryById(@param("id") int id);
+    @Query("SELECT * FROM student WHERE id = ${id}")
+    List<Student> queryById(@Param("id") int id);
 
-    @query("SELECT * FROM student WHERE name = '${teacher.students.${index}.name}' AND age IN (${numbers})")
-    List<Student> queryStudentByTeacher(@param("teacher") Teacher teacher,
-                                        @param(value = "numbers", origin = true) int[] age,
-                                        @param("index") int index);
+    @Query("SELECT * FROM student WHERE name = '${teacher.students.${index}.name}' AND age IN (${numbers})")
+    List<Student> queryStudentByTeacher(@Param("teacher") Teacher teacher,
+                                        @Param("numbers") int[] age,
+                                        @Param("index") int index);
 
-    @query("select * from student where age = ${age} and name = '${name}';")
-    List<Person> query(@param("name") String name, @param("age") int age);
+    @Query("select * from student where age = ${age} and name = '${name}';")
+    List<Person> query(@Param("name") String name, @Param("age") int age);
 
-    @update("insert into student (id,name,age) values(${student.id},'${person.name}',${person.age})")
-    boolean insert(@param("person") Person person, @param("student") Student student);
+    @Update("insert into student (id,name,age) values(${student.id},'${person.name}',${person.age})")
+    boolean insert(@Param("person") Person person, @Param("student") Student student);
 
-    @update("insert into student (id,name,age) values (${person.id},'${person.name}',${student.age})")
-    int insertStudents(@param("person") List<Person> persons, @param("student") List<Student> students);
+    @Update("insert into student (id,name,age) values (${person.id},'${person.name}',${student.age})")
+    int insertStudents(@Params("person") List<Person> persons, @Params("student") List<Student> students);
 }

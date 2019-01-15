@@ -94,7 +94,7 @@ public final class AndroidSQLite extends AbstractInterceptor {
             return executeSql(database, sql);
         } catch (Exception e) {
             LogUtil.debug(e);
-            //database.execSQL(sql);
+            //database.execSQL(Update);
             return 0;
         }
     }
