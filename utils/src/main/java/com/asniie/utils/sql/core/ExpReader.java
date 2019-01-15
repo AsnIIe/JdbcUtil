@@ -55,7 +55,7 @@ public final class ExpReader extends StringReader {
                         break;
                     case '}':
                         level--;
-                        isExp = level != 0;
+                        isExp = level > 0;
                         mBuilder.append(ch);
                         if (!isExp) {
                             String value = value();
